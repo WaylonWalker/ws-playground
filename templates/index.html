@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" class='dark h-full bg-gray-900 text-white'>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WebSocket HTML</title>
+        <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <style>
+            #ws-status {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            .connecting { background-color: orange; color: white; }
+            .connected { background-color: green; color: white; }
+            .disconnected { background-color: red; color: white; }
+            .error { background-color: darkred; color: white; }
+        </style>
+        <script>
+            window.onload = () => {
+                document.getElementById("chatInput").focus();
+                const messagesContainer = document.getElementById("chat_room");
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+        </script>
+    </head>
+    <body>
+
+        <div class="flex flex-col gap-2 justify-center items-center" hx-ext="ws" ws-connect="/ws">
+            <h2>WebSocket HTML Example</h2>
+            <div id="ws-status" class="disconnected">Disconnected</div>
+            <div id="notifications"></div>
+            <ul id="chat_room" hx-swap-oob='beforeend'>
+            </ul>
+            <form id="form" ws-send class="flex gap-2 fixed bottom-0">
+                <input id="chatInput" name="chat_message" class='px-2 py-1 bg-gray-800 border border-gray-600 rounded' type="text">
+            </form>
+        </div>
+    </body>
+    <script>
+        document.addEventListener("htmx:wsConnecting", function() {
+            updateStatus("Connecting...", "connecting");
+        });
+
+        document.addEventListener("htmx:wsOpen", function() {
+            updateStatus("Connected", "connected");
+        });
+
+        document.addEventListener("htmx:wsClose", function() {
+            updateStatus("Disconnected", "disconnected");
+        });
+
+        document.addEventListener("htmx:wsError", function() {
+            updateStatus("Error!", "error");
+        });
+
+        function updateStatus(text, statusClass) {
+            let statusElement = document.getElementById("ws-status");
+            statusElement.textContent = text;
+            statusElement.className = statusClass;
+        }
+    </script>
+</html>
