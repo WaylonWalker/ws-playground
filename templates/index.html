@@ -33,8 +33,17 @@
 
             <div id='after_chat_wrapper'>
             </div>
-            <form id="form" ws-send class="flex gap-2 fixed bottom-0 w-full p-4 bg-gray-900">
-                <input id="chatInput" name="chat_message" class='w-124 min-h-24 rounded-lg px-2 py-1 mx-auto bg-gray-800 border border-gray-600 rounded' type="text">
+            <form
+                id="form"
+                ws-send class="flex gap-2 fixed bottom-0 w-full p-4 bg-gray-900"
+                _="on load focus() the first <input/> in me"
+            >
+                <input
+                    id="chatInput"
+                    name="chat_message"
+                    class='w-124 min-h-24 rounded-lg px-2 py-1 mx-auto bg-gray-800 border border-gray-600 rounded'
+                    type="text"
+                >
             </form>
             <div id="after_form" class='mb-24'>
 

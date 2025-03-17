@@ -43,7 +43,7 @@ new_button = """
                 >
                 </div>
             </div>
-            <div id="after_form" class='mb-24'>
+            <div id="after_form" class='mb-24 flex gap-2'>
                 <button
                     id="go_to_bottom"
                     class="fixed bottom-0 right-0 px-2 py-1 rounded font-bold m-4 invisible"
@@ -60,7 +60,35 @@ new_button = """
                     >
                     go to bottom
                 </button>
+                <button
+                    class="fixed bottom-0 left-0 px-2 py-1 rounded font-bold m-4 bg-red-500 text-white"
+                    hx-get="/clear-chat"
+                    hx-swap="none"
+                    _="on click
+                       add .opacity-50 to me
+                       wait 200ms
+                       remove .opacity-50 from me"
+                    >
+                    clear chat
+                </button>
             </div>
+
+"""
+reset_form = """
+
+            <form
+                id="form"
+                ws-send class="flex gap-2 fixed bottom-0 w-full p-4 bg-gray-900"
+                _="on load focus() the first <input/> in me"
+
+            >
+                <input
+                    id="chatInput"
+                    name="chat_message"
+                    class='w-124 min-h-24 rounded-lg px-2 py-1 mx-auto bg-gray-800 border border-gray-600 rounded'
+                    type="text"
+                >
+            </form>
 """
 # Constants
 REDIS_MESSAGE_LIST = "chat_messages"
@@ -187,8 +215,18 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Publish message to Redis
             await redis_client.publish(WEBSOCKET_CHANNEL, data_str)
+            await websocket.send_text(reset_form)
     except WebSocketDisconnect:
         connected_clients.pop(name)
+
+
+@app.get("/clear-chat")
+async def clear_chat():
+    await redis_client.delete(REDIS_MESSAGE_LIST)
+    return """
+        <div id="chat_room" hx-swap-oob="innerHTML"></div>
+        <div id="notifications" hx-swap-oob="innerHTML"></div>
+    """
 
 
 @app.get("/")
